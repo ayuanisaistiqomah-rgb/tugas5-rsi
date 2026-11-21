@@ -87,3 +87,41 @@ export interface FieldIssue {
   field: string
   message: string
 }
+
+export interface AuditLog {
+  id: number
+  userId: number
+  userName: string | null
+  userEmail: string | null
+  action: string
+  targetTable: string
+  targetId: number
+  metadata: string | null
+  createdAt: string
+  ipAddress: string | null
+  userAgent: string | null
+  result: string | null
+}
+
+export interface AuditLogQuery {
+  page?: number
+  pageSize?: number
+  action?: string
+  targetTable?: string
+  targetId?: number
+  userId?: number
+  from?: string
+  to?: string
+}
+
+export interface AuditLogPagination {
+  page: number
+  pageSize: number
+  total: number
+  totalPages: number
+}
+
+export interface AuditLogListResult {
+  items: AuditLog[]
+  pagination: AuditLogPagination
+}

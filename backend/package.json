@@ -16,7 +16,7 @@
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "drizzle-orm": "^1.0.0-rc.5-5935859",
+    "drizzle-orm": "^1.0.0-rc.5-ab785fc",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mssql": "^11.0.2",

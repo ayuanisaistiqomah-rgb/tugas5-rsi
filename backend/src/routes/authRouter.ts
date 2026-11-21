@@ -36,4 +36,13 @@ authRouter.get('/me', authenticate, (req, res) => {
   return authController.getMe(req, res);
 });
 
+authRouter.post('/logout', authenticate, (req, res) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Logout dan catat audit log'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  // #swagger.responses[200] = { description: 'Logout berhasil' }
+  // #swagger.responses[401] = { description: 'Token tidak ada atau tidak valid' }
+  return authController.logout(req, res);
+});
+
 export { authRouter };

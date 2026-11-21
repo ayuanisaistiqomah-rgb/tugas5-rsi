@@ -40,21 +40,36 @@ export class StallController {
 
   createStall = async (req: Request, res: Response): Promise<void> => {
     const body = getValidated<CreateStallInput>(res, 'body');
-    const { id: ownerId } = getUser(req); // pemilik = user dari token
-    const data = await this.stallService.createStall(body, ownerId);
+    const user = getUser(req);
+
+    const data = await this.stallService.createStall(body, user, {
+      ipAddress: req.ip ?? null,
+      userAgent: req.get('user-agent') ?? null,
+    });
+
     res.status(201).json({ status: 'success', data });
   };
 
   updateStall = async (req: Request, res: Response): Promise<void> => {
     const { id } = getValidated<IdParam>(res, 'params');
     const body = getValidated<UpdateStallInput>(res, 'body');
-    const data = await this.stallService.updateStall(id, body, getUser(req));
+
+    const data = await this.stallService.updateStall(id, body, getUser(req), {
+      ipAddress: req.ip ?? null,
+      userAgent: req.get('user-agent') ?? null,
+    });
+
     res.status(200).json({ status: 'success', data });
   };
 
-  deleteStall = async (_req: Request, res: Response): Promise<void> => {
+  deleteStall = async (req: Request, res: Response): Promise<void> => {
     const { id } = getValidated<IdParam>(res, 'params');
-    const data = await this.stallService.deleteStall(id);
+
+    const data = await this.stallService.deleteStall(id, getUser(req), {
+      ipAddress: req.ip ?? null,
+      userAgent: req.get('user-agent') ?? null,
+    });
+
     res.status(200).json({ status: 'success', data });
   };
 }

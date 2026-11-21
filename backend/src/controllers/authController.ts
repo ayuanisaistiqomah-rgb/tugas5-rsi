@@ -21,10 +21,34 @@ export class AuthController {
     res.status(201).json({ status: 'success', data: { user } });
   };
 
-  login = async (_req: Request, res: Response): Promise<void> => {
-    const body = getValidated<LoginInput>(res, 'body');
-    const data = await this.authService.login(body);
-    res.status(200).json({ status: 'success', data });
+login = async (req: Request, res: Response): Promise<void> => {
+  const body = getValidated<LoginInput>(res, 'body');
+
+  const data = await this.authService.login(body, {
+    ipAddress: req.ip ?? null,
+    userAgent: req.get('user-agent') ?? null,
+  });
+
+  res.status(200).json({ status: 'success', data });
+};
+
+  logout = async (req: Request, res: Response): Promise<void> => {
+    const user = getUser(req);
+
+    // Audit logout bersifat best-effort.
+    try {
+      await this.authService.logout(user, {
+        ipAddress: req.ip ?? null,
+        userAgent: req.get('user-agent') ?? null,
+      });
+    } catch (error) {
+      console.error('Gagal menyimpan audit LOGOUT:', error);
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Logout berhasil',
+    });
   };
 
   // Membalas isi token. Identitas user diambil dari token, bukan dari body.

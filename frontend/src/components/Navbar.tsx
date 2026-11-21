@@ -1,13 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { LogOut, Plus, Utensils } from 'lucide-react'
+import { ClipboardList, LogOut, Plus, Utensils } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { canCreateStall } from '../lib/permissions'
+
 
 export default function Navbar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  function handleLogout() {
+  async function handleLogout() {
     logout()
     navigate('/')
   }
@@ -29,6 +30,13 @@ export default function Navbar() {
             <Link to="/stalls/new" className="flex items-center gap-1.5 hover:underline">
               <Plus size={16} aria-hidden="true" />
               Tambah Warung
+            </Link>
+          )}
+
+          {user?.role === 'admin' && (
+            <Link to="/audit-logs" className="flex items-center gap-1.5 hover:underline">
+              <ClipboardList size={16} aria-hidden="true" />
+              Audit Logs
             </Link>
           )}
 

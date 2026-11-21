@@ -1,8 +1,9 @@
+
 import {
   AuditLogRepository,
   type AuditLogFilter,
 } from '../repositories/auditLogRepository.ts';
-import { UserRepository } from '../repositories/userRepository.ts';
+import type { NodeMsSqlTransaction } from 'drizzle-orm/node-mssql';
 
 export interface CreateAuditLogBody {
   userId: number;
@@ -10,43 +11,57 @@ export interface CreateAuditLogBody {
   targetTable: string;
   targetId: number;
   metadata?: unknown;
+  ipAddress: string | null;
+  userAgent: string | null;
+  result: string;
 }
 
 export class AuditLogService {
   private auditLogRepository: AuditLogRepository;
-  private userRepository: UserRepository;
 
   constructor(
     auditLogRepository: AuditLogRepository = new AuditLogRepository(),
-    userRepository: UserRepository = new UserRepository(),
   ) {
     this.auditLogRepository = auditLogRepository;
-    this.userRepository = userRepository;
   }
 
   async getAllAuditLogs(filter: AuditLogFilter) {
     return this.auditLogRepository.findAll(filter);
   }
 
-  async createAuditLog(body: CreateAuditLogBody) {
-    const user = await this.userRepository.findById(body.userId);
-    if (!user) throw new Error('USER_NOT_FOUND');
+  async getAuditLogById(id: number) {
+    return this.auditLogRepository.findById(id);
+  }
 
-    // metadata boleh object atau string; disimpan sebagai teks JSON.
+  async createAuditLog(
+    body: CreateAuditLogBody,
+    tx?: NodeMsSqlTransaction<any, any>,
+  ) {
     let metadata: string | null = null;
+
     if (body.metadata !== undefined && body.metadata !== null) {
-      metadata = typeof body.metadata === 'string' ? body.metadata : JSON.stringify(body.metadata);
+      metadata =
+        typeof body.metadata === 'string'
+          ? body.metadata
+          : JSON.stringify(body.metadata);
     }
 
-    const row = await this.auditLogRepository.create({
+    const row = await this.auditLogRepository.create(
+      {
       userId: body.userId,
       action: body.action.trim().toUpperCase(),
       targetTable: body.targetTable,
       targetId: body.targetId,
       metadata,
-    });
+      ipAddress: body.ipAddress,
+      userAgent: body.userAgent,
+      result: body.result,
+    },
+    tx,
+  );
+
     if (!row) throw new Error('AUDIT_NOT_FOUND');
 
-    return this.auditLogRepository.findById(row.id);
+    return this.auditLogRepository.findById(row.id, tx);
   }
 }

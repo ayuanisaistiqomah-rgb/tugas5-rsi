@@ -9,6 +9,7 @@ import StallForm from './pages/StallForm'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import { Forbidden, NotFound } from './pages/Forbidden'
+import AuditLogs from './pages/AuditLogs'
 
 function App() {
   return (
@@ -26,6 +27,10 @@ function App() {
               <Route element={<ProtectedRoute roles={['admin', 'owner']} />}>
                 <Route path="/stalls/new" element={<StallForm />} />
                 <Route path="/stalls/:id/edit" element={<StallForm />} />
+              </Route>
+
+              <Route element={<ProtectedRoute roles={['admin']} />}>
+                <Route path="/audit-logs" element={<AuditLogs />} />
               </Route>
 
               <Route path="/forbidden" element={<Forbidden />} />
