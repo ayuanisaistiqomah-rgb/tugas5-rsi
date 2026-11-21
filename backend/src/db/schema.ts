@@ -71,4 +71,7 @@ export const auditLogs = mssqlTable('AUDIT_LOGS', {
   targetId: int('target_id').notNull(),
   metadata: nvarchar('metadata', { length: 'max' }),
   createdAt: datetime2('created_at'),
+  ipAddress: nvarchar('ip_address', { length: 45 }),
+  userAgent: nvarchar('user_agent', { length: 1000 }),
+  result: nvarchar('result', { length: 20 }),
 });

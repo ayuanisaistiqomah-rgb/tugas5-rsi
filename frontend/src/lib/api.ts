@@ -1,6 +1,9 @@
 import axios, { type AxiosResponse } from 'axios'
 import { http } from './http'
 import type {
+  AuditLog,
+  AuditLogListResult,
+  AuditLogQuery,
   ApiResponse,
   FieldIssue,
   LoginInput,
@@ -25,6 +28,7 @@ export const authApi = {
   login: (input: LoginInput) =>
     http.post<ApiResponse<LoginResult>>('/auth/login', input).then(data),
   me: () => http.get<ApiResponse<User>>('/auth/me').then(data),
+  logout: () => http.post<ApiResponse<null>>('/auth/logout'),
 }
 
 export const stallApi = {
@@ -45,6 +49,16 @@ export const stallApi = {
     http.put<ApiResponse<Stall>>(`/stalls/${id}`, input).then(data),
   remove: (id: number) =>
     http.delete<ApiResponse<Stall>>(`/stalls/${id}`).then(data),
+}
+
+export const auditLogApi = {
+  list: (params?: AuditLogQuery) =>
+    http
+      .get<ApiResponse<AuditLogListResult>>('/audit-logs', { params })
+      .then(data),
+
+  detail: (id: number) =>
+    http.get<ApiResponse<AuditLog>>(`/audit-logs/${id}`).then(data),
 }
 
 interface ErrorBody {

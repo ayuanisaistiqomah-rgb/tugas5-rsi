@@ -1,6 +1,7 @@
 import { and, count, eq, like, type SQL } from 'drizzle-orm';
 import { getDb } from '../db/index.ts';
 import { stalls } from '../db/schema.ts';
+import type { NodeMsSqlTransaction } from 'drizzle-orm/node-mssql';
 
 export interface FindAllParams {
   search?: string;
@@ -42,14 +43,18 @@ export class StallRepository {
     return { rows, total: Number(totals[0]?.total ?? 0) };
   }
 
-  async findById(id: number) {
-    const db = await getDb();
+  async findById(id: number, tx?: NodeMsSqlTransaction<any, any>) {
+    const db = tx ?? await getDb();
     const rows = await db.select().from(stalls).where(eq(stalls.id, id));
     return rows[0];
   }
 
-  async create(input: CreateStallInput) {
-    const db = await getDb();
+  async create(
+    input: CreateStallInput,
+    tx?: NodeMsSqlTransaction<any, any>,
+  ) {
+    const db = tx ?? await getDb();
+
     const rows = await db
       .insert(stalls)
       .output()
@@ -62,11 +67,17 @@ export class StallRepository {
         avgRating: '0.00',
         reviewCount: 0,
       });
+
     return rows[0];
   }
 
-  async update(id: number, input: Partial<CreateStallInput>) {
-    const db = await getDb();
+  async update(
+    id: number,
+    input: Partial<CreateStallInput>,
+    tx?: NodeMsSqlTransaction<any, any>,
+  ) {
+    const db = tx ?? await getDb();
+
     const rows = await db
       .update(stalls)
       .set({
@@ -78,12 +89,18 @@ export class StallRepository {
       })
       .where(eq(stalls.id, id))
       .output();
+
     return rows[0];
   }
 
-  async remove(id: number) {
-    const db = await getDb();
-    const rows = await db.delete(stalls).where(eq(stalls.id, id)).output();
+  async remove(id: number, tx?: NodeMsSqlTransaction<any, any>) {
+    const db = tx ?? await getDb();
+
+    const rows = await db
+      .delete(stalls)
+      .where(eq(stalls.id, id))
+      .output();
+
     return rows[0];
   }
 }

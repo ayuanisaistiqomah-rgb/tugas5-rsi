@@ -8,7 +8,7 @@ interface AuthContextValue {
   isReady: boolean
   login: (input: LoginInput) => Promise<User>
   register: (input: RegisterInput) => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -50,9 +50,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await authApi.register(input)
   }
 
-  function logout() {
-    clearToken()
-    setUser(null)
+  async function logout() {
+   try {
+     await authApi.logout()
+    } catch {
+     // Logout tetap dilanjutkan jika pencatatan gagal.
+    } finally {
+      clearToken()
+      setUser(null)
+    }
   }
 
   return (

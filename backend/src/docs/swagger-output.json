@@ -116,6 +116,28 @@
         ]
       }
     },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logout dan catat audit log",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Logout berhasil"
+          },
+          "401": {
+            "description": "Token tidak ada atau tidak valid"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/v1/stalls/": {
       "get": {
         "tags": [
@@ -773,64 +795,124 @@
         "tags": [
           "Audit Logs"
         ],
-        "summary": "Daftar jejak aktivitas (+ nama user), terbaru di atas",
+        "summary": "Daftar audit log",
         "description": "",
         "parameters": [
           {
-            "name": "userId",
+            "name": "page",
             "in": "query",
             "type": "integer",
-            "description": "Filter berdasarkan user"
+            "required": false,
+            "description": "Nomor halaman (default 1)"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "Jumlah data per halaman (default 20, maksimal 100)"
           },
           {
             "name": "action",
             "in": "query",
             "type": "string",
-            "description": "Filter aksi, mis. CREATE / UPDATE"
+            "required": false,
+            "description": "Filter berdasarkan action, contoh LOGIN"
           },
           {
             "name": "targetTable",
             "in": "query",
             "type": "string",
-            "description": "Filter tabel target, mis. REVIEWS"
+            "required": false,
+            "description": "Filter berdasarkan nama tabel"
+          },
+          {
+            "name": "targetId",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "Filter berdasarkan ID target"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "Filter berdasarkan ID pengguna"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "Tanggal awal YYYY-MM-DD"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "Tanggal akhir YYYY-MM-DD"
           }
         ],
         "responses": {
           "200": {
-            "description": "Daftar audit log"
+            "description": "Daftar audit log berhasil ditampilkan"
           },
           "400": {
-            "description": "Query tidak valid"
+            "description": "Validasi parameter gagal"
+          },
+          "401": {
+            "description": "Token autentikasi tidak ditemukan atau tidak valid"
+          },
+          "403": {
+            "description": "Akses ditolak, hanya Admin yang diperbolehkan"
           }
-        }
-      },
-      "post": {
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/audit-logs/{id}": {
+      "get": {
         "tags": [
           "Audit Logs"
         ],
-        "summary": "Catat aktivitas baru",
+        "summary": "Detail audit log berdasarkan ID",
         "description": "",
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "id",
+            "in": "path",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/AuditLogInput"
-            }
+            "type": "string"
           }
         ],
         "responses": {
-          "201": {
-            "description": "Audit log dibuat"
+          "200": {
+            "description": "Detail audit log berhasil ditampilkan"
           },
           "400": {
-            "description": "Body tidak valid"
+            "description": "ID tidak valid"
+          },
+          "401": {
+            "description": "Token autentikasi tidak ditemukan atau tidak valid"
+          },
+          "403": {
+            "description": "Akses ditolak, hanya Admin yang diperbolehkan"
           },
           "404": {
-            "description": "User tidak ditemukan"
+            "description": "Audit log tidak ditemukan"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   },
