@@ -5,7 +5,6 @@ USE review_kantin;
 -- =====================================================================
 DELETE FROM dbo.LIKES;
 DELETE FROM dbo.FLAGS;
-DELETE FROM dbo.AUDIT_LOGS;
 
 -- Kembalikan data seed pertemuan 3 yang sempat berubah saat uji coba
 UPDATE dbo.MENU_ITEMS
@@ -18,7 +17,6 @@ DELETE FROM dbo.USERS      WHERE id > 15;
 -- Reset penomoran ID
 DBCC CHECKIDENT ('dbo.LIKES',      RESEED, 0);
 DBCC CHECKIDENT ('dbo.FLAGS',      RESEED, 0);
-DBCC CHECKIDENT ('dbo.AUDIT_LOGS', RESEED, 0);
 DBCC CHECKIDENT ('dbo.MENU_ITEMS', RESEED, 20);
 DBCC CHECKIDENT ('dbo.STALLS',     RESEED, 10);
 DBCC CHECKIDENT ('dbo.USERS',      RESEED, 15);
@@ -50,12 +48,16 @@ INSERT INTO dbo.FLAGS (review_id, reported_by, reason, status) VALUES
 -- =====================================================================
 -- 4) Seed AUDIT_LOGS (8 baris) - jejak aktivitas yang konsisten dgn data
 -- =====================================================================
-INSERT INTO dbo.AUDIT_LOGS (user_id, action, target_table, target_id, metadata) VALUES
-  (1,  'LOGIN',  'USERS',      1,  N'{"ip":"192.168.1.10"}'),
-  (4,  'UPDATE', 'MENU_ITEMS', 10, N'{"price":{"old":5000,"new":6000}}'),
-  (9,  'UPDATE', 'STALLS',     2,  N'{"description":"Nasi goreng dadakan"}'),
-  (13, 'CREATE', 'REVIEWS',    7,  N'{"stall_id":4,"rating":4}'),
-  (15, 'CREATE', 'REVIEWS',    9,  N'{"stall_id":5,"rating":4}'),
-  (12, 'LIKE',   'REVIEWS',    13, NULL),
-  (2,  'FLAG',   'REVIEWS',    2,  N'{"reason":"Isi ulasan tidak mencerminkan rasa makanan"}'),
-  (1,  'UPDATE', 'FLAGS',      2,  N'{"status":"resolved"}');
+IF NOT EXISTS (SELECT 1 FROM dbo.AUDIT_LOGS)
+BEGIN
+    INSERT INTO dbo.AUDIT_LOGS (user_id, action, target_table, target_id, metadata) VALUES
+      (1,  'LOGIN',  'USERS',      1,  N'{"ip":"192.168.1.10"}'),
+      (4,  'UPDATE', 'MENU_ITEMS', 10, N'{"price":{"old":5000,"new":6000}}'),
+      (9,  'UPDATE', 'STALLS',     2,  N'{"description":"Nasi goreng dadakan"}'),
+      (13, 'CREATE', 'REVIEWS',    7,  N'{"stall_id":4,"rating":4}'),
+      (15, 'CREATE', 'REVIEWS',    9,  N'{"stall_id":5,"rating":4}'),
+      (12, 'LIKE',   'REVIEWS',    13, NULL),
+      (2,  'FLAG',   'REVIEWS',    2,  N'{"reason":"Isi ulasan tidak mencerminkan rasa makanan"}'),
+      (1,  'UPDATE', 'FLAGS',      2,  N'{"status":"resolved"}');
+END
+GO
