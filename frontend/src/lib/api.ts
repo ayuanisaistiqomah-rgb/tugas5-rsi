@@ -1,3 +1,4 @@
+
 import axios, { type AxiosResponse } from 'axios'
 import { http } from './http'
 import type {
@@ -9,6 +10,7 @@ import type {
   LoginInput,
   LoginResult,
   MenuItem,
+  MenuItemPayload,
   PageMeta,
   RegisterInput,
   Stall,
@@ -16,6 +18,8 @@ import type {
   StallListResult,
   StallQuery,
   User,
+  CreateOrderInput,
+  Order,
 } from '../types/api'
 
 function data<T>(response: AxiosResponse<ApiResponse<T>>): T {
@@ -51,6 +55,24 @@ export const stallApi = {
     http.delete<ApiResponse<Stall>>(`/stalls/${id}`).then(data),
 }
 
+export const menuApi = {
+  list: (stallId: number) =>
+    http
+      .get<ApiResponse<MenuItem[]>>('/menu-items', {
+        params: { stallId },
+      })
+      .then(data),
+
+  create: (input: MenuItemPayload) =>
+    http.post<ApiResponse<MenuItem>>('/menu-items', input).then(data),
+
+  update: (id: number, input: Partial<MenuItemPayload>) =>
+    http.put<ApiResponse<MenuItem>>(`/menu-items/${id}`, input).then(data),
+
+  remove: (id: number) =>
+    http.delete<ApiResponse<MenuItem>>(`/menu-items/${id}`).then(data),
+}
+
 export const auditLogApi = {
   list: (params?: AuditLogQuery) =>
     http
@@ -59,6 +81,14 @@ export const auditLogApi = {
 
   detail: (id: number) =>
     http.get<ApiResponse<AuditLog>>(`/audit-logs/${id}`).then(data),
+}
+
+export const orderApi = {
+  create: (input: CreateOrderInput) =>
+    http.post<ApiResponse<Order>>('/orders', input).then(data),
+
+  detail: (id: number) =>
+    http.get<ApiResponse<Order>>(`/orders/${id}`).then(data),
 }
 
 interface ErrorBody {

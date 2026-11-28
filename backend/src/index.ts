@@ -1,3 +1,4 @@
+
 import express, { type Application } from 'express';
 import cors from 'cors';
 import { sql } from 'drizzle-orm';
@@ -12,6 +13,7 @@ import { reviewRouter } from './routes/reviewRouter.ts';
 import { likeRouter } from './routes/likeRouter.ts';
 import { flagRouter } from './routes/flagRouter.ts';
 import { auditLogRouter } from './routes/auditLogRouter.ts';
+import { orderRouter } from './routes/orderRoutes.ts';
 import { notFoundHandler } from './middlewares/notFound.ts';
 import { errorHandler } from './middlewares/errorHandler.ts';
 
@@ -28,7 +30,10 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get('/health', async (_req, res) => {
   const db = await getDb();
   await db.execute(sql`SELECT 1 AS ok`);
-  res.status(200).json({ status: 'success', message: 'Server dan database terhubung' });
+  res.status(200).json({
+    status: 'success',
+    message: 'Server dan database terhubung',
+  });
 });
 
 app.use('/api/v1/auth', authRouter);
@@ -39,6 +44,7 @@ app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/likes', likeRouter);
 app.use('/api/v1/flags', flagRouter);
 app.use('/api/v1/audit-logs', auditLogRouter);
+app.use('/api/v1/orders', orderRouter);
 
 // 404 untuk rute tak dikenal, lalu error handler terpusat (WAJIB paling akhir).
 app.use(notFoundHandler);
