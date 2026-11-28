@@ -443,10 +443,21 @@
           "400": {
             "description": "Body tidak valid"
           },
+          "401": {
+            "description": "Belum login atau token tidak valid"
+          },
+          "403": {
+            "description": "Role tidak memiliki akses"
+          },
           "404": {
             "description": "Warung tidak ditemukan"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/menu-items/{id}": {
@@ -502,10 +513,21 @@
           "400": {
             "description": "Body/parameter tidak valid"
           },
+          "401": {
+            "description": "Belum login atau token tidak valid"
+          },
+          "403": {
+            "description": "Role tidak memiliki akses"
+          },
           "404": {
             "description": "Menu atau warung tidak ditemukan"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -525,10 +547,21 @@
           "200": {
             "description": "Menu terhapus"
           },
+          "401": {
+            "description": "Belum login atau token tidak valid"
+          },
+          "403": {
+            "description": "Role tidak memiliki akses"
+          },
           "404": {
             "description": "Menu tidak ditemukan"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/users/": {

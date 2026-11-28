@@ -31,22 +31,42 @@ export default function AuditLogs() {
   const [page, setPage] = useState(1)
   const pageSize = 10
 
-  async function loadAuditLogs() {
+  async function loadAuditLogs(
+    currentPage = page,
+    currentFilters = filters,
+  ) {
     try {
       setLoading(true)
       setError('')
 
       const params: AuditLogQuery = {
-        page,
+        page: currentPage,
         pageSize,
       }
 
-      if (filters.action) params.action = filters.action
-      if (filters.targetTable) params.targetTable = filters.targetTable
-      if (filters.targetId) params.targetId = Number(filters.targetId)
-      if (filters.userId) params.userId = Number(filters.userId)
-      if (filters.from) params.from = filters.from
-      if (filters.to) params.to = filters.to
+      if (currentFilters.action) {
+        params.action = currentFilters.action.trim()
+      }
+
+      if (currentFilters.targetTable) {
+        params.targetTable = currentFilters.targetTable.trim()
+      }
+
+      if (currentFilters.targetId) {
+        params.targetId = Number(currentFilters.targetId)
+      }
+
+      if (currentFilters.userId) {
+        params.userId = Number(currentFilters.userId)
+      }
+
+      if (currentFilters.from) {
+        params.from = currentFilters.from
+      }
+
+      if (currentFilters.to) {
+        params.to = currentFilters.to
+      }
 
       const result = await auditLogApi.list(params)
 
@@ -60,45 +80,33 @@ export default function AuditLogs() {
   }
 
   useEffect(() => {
-    loadAuditLogs()
+    loadAuditLogs(page)
   }, [page])
 
   function handleFilter() {
-    setPage(1)
-    loadAuditLogs()
+    if (page === 1) {
+      loadAuditLogs(1, filters)
+    } else {
+      setPage(1)
+    }
   }
 
   function handleReset() {
-    setFilters({
+    const emptyFilters = {
       action: '',
       targetTable: '',
       targetId: '',
       userId: '',
       from: '',
       to: '',
-    })
-    setPage(1)
-    setTimeout(() => {
-      loadAuditLogsWithEmptyFilters()
-    }, 0)
-  }
+    }
 
-  async function loadAuditLogsWithEmptyFilters() {
-    try {
-      setLoading(true)
-      setError('')
+    setFilters(emptyFilters)
 
-      const result = await auditLogApi.list({
-        page: 1,
-        pageSize,
-      })
-
-      setItems(result.items)
-      setPagination(result.pagination)
-    } catch (err) {
-      setError(getErrorMessage(err))
-    } finally {
-      setLoading(false)
+    if (page === 1) {
+      loadAuditLogs(1, emptyFilters)
+    } else {
+      setPage(1)
     }
   }
 
@@ -255,7 +263,7 @@ export default function AuditLogs() {
             <ErrorPanel message={error} />
             <button
               type="button"
-              onClick={loadAuditLogs}
+              onClick={() => loadAuditLogs(page)}
               className="mt-3 rounded-xl bg-ink px-4 py-2 text-sm font-bold text-white"
             >
               Coba Lagi

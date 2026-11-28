@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from '../db/index.ts';
 import { menuItems, stalls } from '../db/schema.ts';
+import type { NodeMsSqlTransaction } from 'drizzle-orm/node-mssql';
 
 export interface CreateMenuItemInput {
   stallId: number;
@@ -38,18 +39,27 @@ export class MenuItemRepository {
       .orderBy(menuItems.id);
   }
 
-  async findByIdWithStall(id: number) {
-    const db = await getDb();
+  async findByIdWithStall(
+    id: number,
+    tx?: NodeMsSqlTransaction<any, any>,
+  ) {
+    const db = tx ?? await getDb();
+
     const rows = await db
       .select(menuWithStallColumns)
       .from(menuItems)
       .innerJoin(stalls, eq(menuItems.stallId, stalls.id))
       .where(eq(menuItems.id, id));
+
     return rows[0];
   }
 
-  async create(input: CreateMenuItemInput) {
-    const db = await getDb();
+  async create(
+    input: CreateMenuItemInput,
+    tx?: NodeMsSqlTransaction<any, any>,
+  ) {
+    const db = tx ?? await getDb();
+
     const rows = await db
       .insert(menuItems)
       .output()
@@ -59,11 +69,17 @@ export class MenuItemRepository {
         price: input.price,
         isAvailable: input.isAvailable ?? true,
       });
+
     return rows[0];
   }
 
-  async update(id: number, input: Partial<CreateMenuItemInput>) {
-    const db = await getDb();
+  async update(
+    id: number,
+    input: Partial<CreateMenuItemInput>,
+    tx?: NodeMsSqlTransaction<any, any>,
+  ) {
+    const db = tx ?? await getDb();
+
     const rows = await db
       .update(menuItems)
       .set({
@@ -74,12 +90,21 @@ export class MenuItemRepository {
       })
       .where(eq(menuItems.id, id))
       .output();
+
     return rows[0];
   }
 
-  async remove(id: number) {
-    const db = await getDb();
-    const rows = await db.delete(menuItems).where(eq(menuItems.id, id)).output();
+  async remove(
+    id: number,
+    tx?: NodeMsSqlTransaction<any, any>,
+  ) {
+    const db = tx ?? await getDb();
+
+    const rows = await db
+      .delete(menuItems)
+      .where(eq(menuItems.id, id))
+      .output();
+
     return rows[0];
   }
 }
