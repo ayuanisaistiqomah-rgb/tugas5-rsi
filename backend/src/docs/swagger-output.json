@@ -947,6 +947,83 @@
           }
         ]
       }
+    },
+    "/api/v1/orders/": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Membuat pesanan baru",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateOrderInput"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Pesanan berhasil dibuat"
+          },
+          "400": {
+            "description": "Data pesanan tidak valid"
+          },
+          "401": {
+            "description": "Belum login atau token tidak valid"
+          },
+          "403": {
+            "description": "Role tidak memiliki akses"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/orders/{id}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Melihat detail pesanan",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail pesanan beserta item"
+          },
+          "400": {
+            "description": "ID pesanan tidak valid"
+          },
+          "401": {
+            "description": "Belum login atau token tidak valid"
+          },
+          "403": {
+            "description": "Tidak memiliki akses ke pesanan ini"
+          },
+          "404": {
+            "description": "Pesanan tidak ditemukan"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "definitions": {

@@ -29,11 +29,19 @@ export interface Stall {
 export interface MenuItem {
   id: number
   stallId: number
+  stallName: string
+  stallLocation: string | null
   name: string
   price: number
   isAvailable: boolean
 }
 
+export interface MenuItemPayload {
+  stallId: number
+  name: string
+  price: number
+  isAvailable: boolean
+}
 export interface StallInput {
   name: string
   category: string
@@ -124,4 +132,43 @@ export interface AuditLogPagination {
 export interface AuditLogListResult {
   items: AuditLog[]
   pagination: AuditLogPagination
+}
+
+
+export interface CreateOrderItemInput {
+  menuId: number
+  quantity: number
+}
+
+export interface CreateOrderInput {
+  customerName: string
+  phone: string
+  paymentMethod: 'transfer' | 'qris' | 'cash'
+  note?: string
+  items: CreateOrderItemInput[]
+}
+
+export interface OrderItem {
+  id: number
+  menuId: number | null
+  stallId: number | null
+  stallName: string | null
+  menuName: string
+  unitPrice: number
+  quantity: number
+  subtotal: number
+}
+
+export interface Order {
+  id: number
+  orderCode: string
+  customerId: number
+  customerName: string
+  phone: string
+  paymentMethod: string
+  note: string | null
+  total: number
+  status: string
+  createdAt: string
+  items: OrderItem[]
 }
